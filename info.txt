@@ -1,8 +1,0 @@
-Info
-
-Run the batch file, the batch will exe the vbs file.
-
-The purpose of the vbs file is to Spilt the .xlsx file up according to specs set by the support team for that client. The vbs file was used before i started,
-and so i turned this vbs file from a 200 line page, to a 3000 line page, that can handle just about any senario.
-
-the vbs file will create a .ini schema, and generate inventory files for there dealership group
