@@ -4,10 +4,9 @@ Option Explicit
 	Const current = "current" ,scrap = "scrap" , obs = "obs" 			
 	SetLocale(1045)  '' sets to dutch language settings '' 1033 for german descptions
 	
-'########################  v 118 #############################################
+'########################  v 117 #############################################
 
 'CONFIGURATION SECTION
-'v118 youness PC is slow, we need to slow down the splitfile. with a sleep   1146
 'v116 remove xchars from start of date column
 'v115 is a todo to fix, nothing has changed colin still needs to work on this. 
 'v114 Divide By QTY bug, too easy for raw qty to be larger than maxqyt if / 100, so a lot of 9999 qty can happen
@@ -23,21 +22,21 @@ Option Explicit
 'v104 UNL files , handle automatically in the RegeXRun function for everyone
 '#####################################################################
 
-FileName =  "parex.xlsx"			            'File name, multiple files seperate filenames with comma , USE false for autoreadfiles for when we dont know the filenameS.
-AllowStockFikeToBeAutoRenamed= "true" 	    'This will check if there is any file with the same extension as the stock file and rename it to the name specified above for the stock file
+FileName = "brandA.txt,brandB.txt"			            'File name, multiple files seperate filenames with comma , USE false for autoreadfiles for when we dont know the filenameS.
+AllowStockFikeToBeAutoRenamed= "false" 	    'This will check if there is any file with the same extension as the stock file and rename it to the name specified above for the stock file
 
-Const FormatDelimited = "T"					'F = Fixedlength , T = tabdelimited (must use T for xls/xml)  ; = semi colon Delimiter
-Const ReadCharacterSet = 3		        '1=OEM  2=ANSI 3=Unicode  4=65001		
+Const FormatDelimited = ","					'F = Fixedlength , T = tabdelimited (must use T for xls/xml)  ; = semi colon Delimiter
+Const ReadCharacterSet = 2		        '1=OEM  2=ANSI 3=Unicode  4=65001		
 Const DecimalSymbol = "."					
 Const DidgetGroupingSymbol =""				'1.000,00  is 1000 units. We need to always remove the "."
 
 ''Schema Columns  
 Const S_partsID = "2"						'Fixed width file use StartPos and EndPosition seperated with a comma. EG "3,9" .XLS count starts with 0 | Converting xls > csv count starts at 1  | 				
-Const S_numberInStock = "20"  			    'For MultiQTY( where one file has mulit dealers split by numberin stock) use a ",".  This will turn numberinstock into an array of dealers.  Will not work on width delimiter!
-Const S_Brand = ""					        
-Const S_Outlet= ""                          
-Const S_LastPurchase  = ""                  
-Const S_LastSale = ""                       
+Const S_numberInStock = "5"  			    'For MultiQTY( where one file has mulit dealers split by numberin stock) use a ",".  This will turn numberinstock into an array of dealers.  Will not work on width delimiter!
+Const S_Brand = "4"					        
+Const S_Outlet= "1"                          
+Const S_LastPurchase = "9"                  
+Const S_LastSale = "6"                       
 Const S_PartsCategory =""                   
 Const S_Filterby =""						'Pick Column here, and below in the  "FilterBy" you MUST insert what you want to filter by.   Will find matching values.   Use , seperateor for 
 Const S_AndFilterBy=""						'Pick Column here, and below in the  "AndFilterBy" you MUST  insert what you want to filter by.   Will find matching values.   
@@ -52,26 +51,26 @@ Const S_condition=""
 Const S_purchaseprice="" 
 
 'Brands/Oulets data.
-Const outlets=""        	       	' "automatic" for all distinct outlets. Or specify seperate outlets seperated by commas. To speed up large file, best to insert values.
-Const brands=""					' "automatic" for all distinct brands. Or specify seperate brands seperated by commas
+Const outlets="automatic"        	       	' "automatic" for all distinct outlets. Or specify seperate outlets seperated by commas. To speed up large file, best to insert values.
+Const brands="automatic"					' "automatic" for all distinct brands. Or specify seperate brands seperated by commas
 Const BrandsNotinColumns=""			    	' S_Brand must be "" ,  will find the BRAND somwwhere in your txt file. Will find brand match, write files for that brand, untill next brand is found.
 const BrandsInPartID=""				    	' [leftover] FOR everything else. Enter brands with comma to seperate.  This will search for Brands inside the partid, only at the starting position
 BrandWildcard = "false"				' makes the brands a wildcard value, so N will search for all values in brand table with nissan, nis, nestel, nss ect... default must be false otherwise true
 
 
 'DATE format
-DateFormat = "dd/mm/yyyy"		 			'Format fro dates. The seperator style is not important. use d/mm/yyyy , dd/mm/yyy ,  Cant have single day sinlge m like m/d/yyy then u have to use the SplitDateBy
+DateFormat = "mm/dd/yyyy"		 			'Format fro dates. The seperator style is not important. use d/mm/yyyy , dd/mm/yyy ,  Cant have single day sinlge m like m/d/yyy then u have to use the SplitDateBy
 SplitDateBy=""							    'only use this if dateformat does not work. This is plan B.	
 DateisText="" 					    		' [JAN,FEB,MAR,APR,MAY,JUN,JUL,AUG,SEP,OCT,NOV,DEC] leave empty to ignore
 RemoveXcharsfromDate = 0					 'Default to 0; removes X chars from the start of date. so ="1" will change  120151201 to 12151201
-DaysSincelastMovementObsolete =	730		'number of days after which part is considered obsolete, f.i. 730 = 2 years
+DaysSincelastMovementObsolete = 730		'number of days after which part is considered obsolete, f.i. 730 = 2 years
 DaysSincelastMovementScrap= 1460	'number of days after which part is considered scrap, f.i.1460 4 years
 MinDaysInStock = 0						   	'number of days a part needs to be in stock before it is included in current. Use 0 to ignore. Can use this to ignore current stock, by setting it to same value as DaysSincelastMovementObsolete + 1 day.
 	
 'Date values
 usedatelastPurchase = "true" 				'choose datelastpurchase or datelastsale, set to false if you want datelastsale or keep as true. If empty it will default to the other, if other is empty it will set to the 2 below settings.
 SettingsForEmptyDate = current  		 	'use current, scrap or obs , so if date is empty we put this date into current , scrap or obs
-SettingsForInvalidDate =  current 		 	'use current, scrap or obs, hopefull we never get this far. if so, contact IT to fix this script
+SettingsForInvalidDate = current 		 	'use current, scrap or obs, hopefull we never get this far. if so, contact IT to fix this script
 
 'Date categories
 ObsCategories = ""         				    'seperate outlets with comma  When Using PartsCategory Category, all other parts categories  are current unless there is a match below 
@@ -119,14 +118,14 @@ WriteDisposition= "false"                  'if "true" the selection criteria are
 const ObsoleteFile = "obs.csv"                  
 const CurrentFile = "cur.csv"                   
 const ScrapFile = "scrap.csv"                        
-Fieldseperator = "," 		  '' vbTab for tab no quotes, or else "," for others
+Fieldseperator = ";" 		  '' vbTab for tab no quotes, or else "," for others
 
 'XLS						
-Const xlsSheetNumber = "1"      			    'use numbers to identify your sheet, 1,2,3 ect..
-ConvertXLSToTXTTAB ="true"	    	 		'Will convert xls to csv. Set to true or leave empty. If your xls is giving problems, then it is beter to set this to true to convert xls to csv
+Const xlsSheetNumber = ""      			    'use numbers to identify your sheet, 1,2,3 ect..
+ConvertXLSToTXTTAB =""	    	 		'Will convert xls to csv. Set to true or leave empty. If your xls is giving problems, then it is beter to set this to true to convert xls to csv
 Const ClientSideXLSTOCSVconvertion = ""  ' We only use this option if we cant open xls files on parex server. This means client is using pivot table or linking, so we just need the raw csv conversion
 Const XLSBadDataIgnore=""						'XLS null values occur when Integers are mixed with strings.Tthis results in bad null values. Set to false to ingnore these values, and exclude them from stockfile. Beter option is to convert to csv file
-Const ColumnFormatForQTY =  "0.00"  				'CAN USE "Text" or "0.0"
+Const ColumnFormatForQTY = "0.00"  				'CAN USE "Text" or "0.0"
 Const deletecolumns=""                        ' work backwards AF,AE,AD,AC,AB,AA,Z,Y,W,V,U,T,P,N,M,L,K,I,H,G,F,E,D,C
 xlsSheetName = ""      	  'Can have multiple sheets,seperate sheet names with commas. Use this for real XLS and not covererted to csv. We like to use sheetno above!
 
@@ -1121,7 +1120,7 @@ Function ConvertXLStoCSVFiles()
 						set objExcel=nothing
 						Set objWB = Nothing
 						concatfilenames = concatfilenames + filelist(sh) + ".txt" + "," 
-						WScript.Sleep(1000)
+						''RegeXRunFile(filelist(sh) + ".txt" )
 					next
 				
 					if  Instr(concatfilenames, ",") <>0 then concatfilenames = 	Left(concatfilenames,Len(concatfilenames)-1)
@@ -1132,7 +1131,7 @@ Function ConvertXLStoCSVFiles()
 	Set objWS = Nothing
 	Set	objExcel = Nothing
 	
-	WScript.Sleep(2000)
+	
 	if ClientSideXLSTOCSVconvertion="true" then
 				 wscript.quit
 	end if
@@ -2984,7 +2983,7 @@ function PartsID(Byval parts)
 		
 		'''' 8th rd PartID format. remove x chars from beg of string, left to right
 		if len(replacestartchar) > 0 Then
-		If left(temppart,replacestartcharcount)= replacestartchar then
+			If left(temppart,replacestartcharcount)= replacestartchar then
 				temppart = right(temppart, len(temppart) - replacestartcharcount )
 			end if
 		end if
