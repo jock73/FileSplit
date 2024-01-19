@@ -7,7 +7,7 @@ Option Explicit
 '########################  v 118 #############################################
 
 'CONFIGURATION SECTION
-'v118 youness PC is shit, we need to slow down the splitfile. with a sleep   1146
+'v118 youness PC is slow, we need to slow down the splitfile. with a sleep   1146
 'v116 remove xchars from start of date column
 'v115 is a todo to fix, nothing has changed colin still needs to work on this. 
 'v114 Divide By QTY bug, too easy for raw qty to be larger than maxqyt if / 100, so a lot of 9999 qty can happen
